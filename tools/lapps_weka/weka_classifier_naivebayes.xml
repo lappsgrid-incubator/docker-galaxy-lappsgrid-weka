@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tool id="weka.classifier.smo" name="SMO Classifier" version="0.1.0">
-    <description>WEKA'S Sequential Minimal Optimization algorithm for training a support vector classifier.</description>
+<tool id="weka.classifier.naivebayes" name="NaiveBayes Classifier" version="0.1.0">
+    <description>WEKA'S Naive Bayes classifier using estimator classes.</description>
     <command>
         <![CDATA[
              java -cp '$__tool_directory__/weka.jar' weka.classifiers.functions.SMO
@@ -26,35 +26,15 @@
                 #if int( $decimal ) != 2
                     -num-decimal-places $decimal
                 #end if
+                $debug
+                #if int( $batch ) != 100
+                    -batch-size $batch
+                #end if
                 $force_batch $no_stats $no_classifier $class_stats $info_stats $cum_margin
                 #if str( $classification ) != ""
                     -classifications '$classification'
                 #end if
-                #if str( $kernel ) != ""
-                    -K $kernel
-                #end if
-                #if str( $calibration ) != ""
-                    -calibrator $calibration
-                #end if
-                #if str( $complexity ) != '1'
-                    -C $complexity
-                #end if
-                #if int( $normalization ) != 0
-                    -N $normalization
-                #end if
-                #if str( $tolerance ) != '1.03e-3'
-                    -L $tolerance
-                #end if
-                #if str( $epsilon ) != '1.0e-12'
-                    -P $epsilon
-                #end if
-                $svm_calibration  $debug
-                #if str( $internal_folds ) != "-1"
-                    -V $internal_folds
-                #end if
-                #if int( $batch ) != 100
-                    -batch-size $batch
-                #end if
+                $kernel_density $discretization
         ]]>
     </command>
     <inputs>
@@ -121,30 +101,19 @@
 
         <param name="decimal" type="integer" value="2" label="Number of decimal places for the output in the model" />
 
-        <param label="Normalization/Standardization" name="normalization" type="select">
-            <option selected="true" value="0">Normalize</option>
-            <option value="1">Standardize</option>
-            <option value="2">Neither</option>
-        </param>
-
         <param name="force_batch" type="boolean" checked="false" label="Always train classifier in batch mode, never incrementally" truevalue="-force-batch-training" falsevalue="" />
         <param name="no_stats" type="boolean" checked="false" label="Do not output statistics for training data" truevalue="-v" falsevalue="" />
         <param name="no_classifier" type="boolean" checked="false" label="Output statistics only, no classifier" truevalue="-o" falsevalue="" />
         <param name="class_stats" type="boolean" checked="false" label="Do not output statistics for each class" truevalue="-do-not-output-per-class-statistics" falsevalue="" />
         <param name="info_stats" type="boolean" checked="false" label="Output information-theoretic statistics" truevalue="-k" falsevalue="" />
         <param name="cum_margin" type="boolean" checked="false" label="Only outputs cumulative margin distribution" truevalue="-r" falsevalue="" />        
-
-        <param name="complexity" type="float" value='1' label='The complexity constant C' />
-        
-        <param name="tolerance" type="float" value='1.03e-3' label='The tolerance parameter' />
-        <param name="epsilon" type="float" value='1.0e-12' label='The epsilon for round-off error' />
         <param name="batch" type="integer" value='100' label='The desired batch size for batch prediction' />
-        <param name="internal_folds" type="float" value='-1' label='The number of folds for the internal cross-validation. (default -1, use training data)' />
-        <param name="svm_calibration" type="boolean" checked="false" label="Fit calibration models to SVM outputs" truevalue="-M" falsevalue="" />
+
+        <param name="kernel_density" type="boolean" checked="false" label="Use kernel density estimator rather than normal distribution for numeric attributes" truevalue="-K" falsevalue="" />
+        <param name="discretization" type="boolean" checked="false" label="Use supervised discretization to process numeric attributes" truevalue="-D" falsevalue="" />
+
 
         <param name="classification" type="text" value="" optional="true" label="(Optional) Specify a class for generating the classification output" />
-        <param name="kernel" type="text" value="" optional="true" label="(Optional) Specify a classname and parameters for a kernel to use" />
-        <param name="calibration" type="text" value="" optional="true" label="(Optional) Specify the full name of a calibration model, followed by options" />
 
         <param name="debug" type="boolean" checked="false" label="Run in debug mode" truevalue="-output-debug-info" falsevalue="" />
 

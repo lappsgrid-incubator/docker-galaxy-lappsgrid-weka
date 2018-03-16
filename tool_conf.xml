@@ -12,6 +12,9 @@
    </section>
    <section id="weka" name="WEKA Tools">
       <tool file="lapps_weka/weka_classifier_smo.xml" />
+      <tool file="lapps_weka/weka_classifier_naivebayes.xml" />
+      <tool file="lapps_weka/weka_classifier_logistic.xml" />
+      <tool file="lapps_weka/weka_classifier_j48.xml" />
    </section>
    <section id="ldc" name="Gigaword">
       <tool file="lapps_gigaword/list.xml" />

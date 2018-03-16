@@ -8,7 +8,7 @@ MAINTAINER Alexandru Mahmoud, almahmoud@vassar.edu
 
 ENV GALAXY_CONFIG_BRAND LAPPS
 
-RUN apt-get update && apt-get install -y bash emacs24-nox git default-jre python3
+RUN apt-get update && apt-get install -y bash git default-jre
 
 ADD ./packages/lsd.tgz /usr/bin
 RUN chmod a+x /usr/bin/lsd

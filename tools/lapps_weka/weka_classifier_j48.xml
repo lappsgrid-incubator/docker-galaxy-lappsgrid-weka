@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tool id="weka.classifier.smo" name="SMO Classifier" version="0.1.0">
-    <description>WEKA'S Sequential Minimal Optimization algorithm for training a support vector classifier.</description>
+<tool id="weka.tree.j48" name="J48 Decision Tree" version="0.1.0">
+    <description>WEKA'S J48 decision tree</description>
     <command>
         <![CDATA[
              java -cp '$__tool_directory__/weka.jar' weka.classifiers.functions.SMO
@@ -26,35 +26,25 @@
                 #if int( $decimal ) != 2
                     -num-decimal-places $decimal
                 #end if
+                $debug
+                #if int( $batch ) != 100
+                    -batch-size $batch
+                #end if
                 $force_batch $no_stats $no_classifier $class_stats $info_stats $cum_margin
                 #if str( $classification ) != ""
                     -classifications '$classification'
                 #end if
-                #if str( $kernel ) != ""
-                    -K $kernel
+                $unpruned $collapse
+                #if str( $pruning ) != "0.25"
+                    -C $pruning
                 #end if
-                #if str( $calibration ) != ""
-                    -calibrator $calibration
+                #if int( $leaf ) != 2
+                    -M $leaf
                 #end if
-                #if str( $complexity ) != '1'
-                    -C $complexity
+                #if str( $reduced.reduced_selection ) == "yes_reduced"
+                    -R -N $reduced.reduced_sets
                 #end if
-                #if int( $normalization ) != 0
-                    -N $normalization
-                #end if
-                #if str( $tolerance ) != '1.03e-3'
-                    -L $tolerance
-                #end if
-                #if str( $epsilon ) != '1.0e-12'
-                    -P $epsilon
-                #end if
-                $svm_calibration  $debug
-                #if str( $internal_folds ) != "-1"
-                    -V $internal_folds
-                #end if
-                #if int( $batch ) != 100
-                    -batch-size $batch
-                #end if
+                $binary $raising $laplace $mdl $split_value
         ]]>
     </command>
     <inputs>
@@ -121,30 +111,39 @@
 
         <param name="decimal" type="integer" value="2" label="Number of decimal places for the output in the model" />
 
-        <param label="Normalization/Standardization" name="normalization" type="select">
-            <option selected="true" value="0">Normalize</option>
-            <option value="1">Standardize</option>
-            <option value="2">Neither</option>
-        </param>
-
         <param name="force_batch" type="boolean" checked="false" label="Always train classifier in batch mode, never incrementally" truevalue="-force-batch-training" falsevalue="" />
         <param name="no_stats" type="boolean" checked="false" label="Do not output statistics for training data" truevalue="-v" falsevalue="" />
         <param name="no_classifier" type="boolean" checked="false" label="Output statistics only, no classifier" truevalue="-o" falsevalue="" />
         <param name="class_stats" type="boolean" checked="false" label="Do not output statistics for each class" truevalue="-do-not-output-per-class-statistics" falsevalue="" />
         <param name="info_stats" type="boolean" checked="false" label="Output information-theoretic statistics" truevalue="-k" falsevalue="" />
         <param name="cum_margin" type="boolean" checked="false" label="Only outputs cumulative margin distribution" truevalue="-r" falsevalue="" />        
-
-        <param name="complexity" type="float" value='1' label='The complexity constant C' />
-        
-        <param name="tolerance" type="float" value='1.03e-3' label='The tolerance parameter' />
-        <param name="epsilon" type="float" value='1.0e-12' label='The epsilon for round-off error' />
         <param name="batch" type="integer" value='100' label='The desired batch size for batch prediction' />
-        <param name="internal_folds" type="float" value='-1' label='The number of folds for the internal cross-validation. (default -1, use training data)' />
-        <param name="svm_calibration" type="boolean" checked="false" label="Fit calibration models to SVM outputs" truevalue="-M" falsevalue="" />
+
+        <param name="unpruned" type="boolean" checked="false" label="Use unpruned tree" truevalue="-U" falsevalue="" />
+        <param name="collapse" type="boolean" checked="true" label="Collapse tree" truevalue="" falsevalue="-O" />
+
+        <param name="pruning" type="float" value='0.25' optional='true' label='Set confidence threshold for pruning' />
+        <param name="leaf" type="integer" value='2' optional='true' label='Set minimum number of instances per leaf' />
+
+        <conditional name="reduced">
+            <param label="Reduced error pruning" name="reduced_selection" type="select">
+                <option selected="true" value="no_reduced">Do not use reduced error pruning</option>
+                <option value="yes_reduced">Use reduced error pruning</option>
+            </param>
+            <when value="no_reduced"></when>
+            <when value="yes_reduced">
+                <param name="reduced_sets" type="integer" value='3' label="Set number of folds for reduced error pruning" />
+            </when>
+        </conditional>
+
+        <param name="binary" type="boolean" checked="false" label="Use binary splits only" truevalue="-B" falsevalue="" />
+        <param name="raising" type="boolean" checked="false" label="Do not perform subtree raising" truevalue="-S" falsevalue="" />
+        <param name="laplace" type="boolean" checked="false" label="Laplace smoothing for predicted probabilities" truevalue="-A" falsevalue="" />
+
+        <param name="mdl" type="boolean" checked="true" label="Use MDL correction for info gain on numeric attributes" truevalue="" falsevalue="-J" />
+        <param name="split_value" type="boolean" checked="true" label="Make split point actual value" truevalue="" falsevalue="-doNotMakeSplitPointActualValue" />
 
         <param name="classification" type="text" value="" optional="true" label="(Optional) Specify a class for generating the classification output" />
-        <param name="kernel" type="text" value="" optional="true" label="(Optional) Specify a classname and parameters for a kernel to use" />
-        <param name="calibration" type="text" value="" optional="true" label="(Optional) Specify the full name of a calibration model, followed by options" />
 
         <param name="debug" type="boolean" checked="false" label="Run in debug mode" truevalue="-output-debug-info" falsevalue="" />
 
