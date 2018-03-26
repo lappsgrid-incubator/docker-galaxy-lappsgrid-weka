@@ -3,22 +3,22 @@
     <description>WEKA'S Naive Bayes classifier using estimator classes.</description>
     <command>
         <![CDATA[
-             java -cp '$__tool_directory__/weka.jar' weka.classifiers.functions.SMO
+             java -cp '$__tool_directory__/weka.jar' weka.classifiers.bayes.NaiveBayes
                 -t '$train_file'
                 #if str( $testing.testing_selection ) == "cv_option"
-                    -x $cv_folds $training_splits
+                    -x $testing.cv_folds $testing.training_splits
                 #end if
                 #if str( $testing.testing_selection ) == "split_option"
-                    -split-percentage $split_perc $split_preserve $training_splits
+                    -split-percentage $testing.split_perc $testing.split_preserve $testing.training_splits
                 #end if
                 #if str( $testing.testing_selection ) == "file_option"
-                    -T '$test_file'
+                    -T '$testing.test_file'
                 #end if
                 #if str( $testing.testing_selection ) == "no_option"
                     -no-cv
                 #end if
                 #if str( $class.class_selection ) == "index_option"
-                    -c $class_index
+                    -c $class.class_index
                 #end if
                 #if str( $toggle ) != ""
                     -toggle '$toggle'
@@ -67,7 +67,7 @@
             </param>
             <when value="default_option"></when>
             <when value="index_option">
-                <param name="class_index" type="integer" value='0' label="Class Index" />
+                <param name="class_index" type="text" value='last' label="Class Index ('first', 'last', or integer)" />
             </when>
         </conditional>
 
